@@ -1,0 +1,20 @@
+# HTTP requests for API calls
+requests
+
+# Environment variable management
+python-dotenv
+
+# String matching and search
+fuzzywuzzy
+python-Levenshtein  # Improves fuzzywuzzy performance
+
+# Database and data handling
+sqlalchemy
+pandas
+numpy
+psycopg2-binary  # PostgreSQL adapter
+
+# Visualization
+matplotlib
+seaborn
+streamlit

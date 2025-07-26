@@ -1,0 +1,23 @@
+The system defines a set of report types, each associated with specific database tables. When generating SQL queries from natural language input, the model should identify the appropriate report type and, if applicable, use only the corresponding tables relevant to that report.
+
+1) For the FPS Inspection Report, the relevant tables are: surveys, surveys_fair_price_shop_lnk, fair_price_shops, surveys_poims_user_lnk, poims_users, fair_price_shops_village_lnk, villages, villages_panchayat_lnk, panchayats, panchayats_block_lnk, blocks, blocks_sub_division_lnk, sub_divisions, sub_divisions_district_lnk, and districts.
+
+2) For the FPS Compliance Status Summary, the model should use all the tables from the FPS Inspection Report, along with question_surveys_survey_lnk, question_surveys, question_surveys_question_lnk, questions, categories_questions_lnk, and categories.
+
+3) The FPS Stock Verification Report uses the same set of tables as FPS Compliance Status Summary.
+
+4) The FPS Beneficiary Feedback report uses all the tables from the FPS Stock Verification Report and adds question_survey_beneficiaries_survey_lnk, question_survey_beneficiaries, and question_survey_beneficiaries_question_lnk.
+ 
+5) The FPS Inspection Allocation Report relies on the following tables: districts, sub_divisions_district_lnk, sub_divisions, blocks_sub_division_lnk, blocks, panchayats_block_lnk, panchayats, villages_panchayat_lnk, villages, fair_price_shops, fair_price_shops_village_lnk, inspection_schedulings, inspection_schedulings_assigned_by_lnk, inspection_schedulings_assigned_to_lnk, and inspection_schedulings_fps_id_lnk.
+
+6) For the CMR/TPDS Godown Inspection Report, use surveys, surveys_survey_type_lnk, surveys_godown_lnk, godowns, godowns_panchayat_lnk, panchayats, panchayats_block_lnk, blocks, blocks_sub_division_lnk, sub_divisions, sub_divisions_district_lnk, districts, surveys_poims_user_lnk, and poims_users.
+
+7) The CMR/TPDS Compliance Status Summary report uses all the tables from the CMR/TPDS Godown Inspection Report, and includes question_surveys_survey_lnk, question_surveys, question_surveys_question_lnk, questions, categories_questions_lnk, and categories.
+
+8) The CMR/TPDS Godown Stock Verification Report uses the same set of tables as the CMR/TPDS Compliance Status Summary.
+
+9) For the CMR/TPDS Grain Sample Feedback, include all tables from the Godown Stock Verification Report and additionally use grain_sample_question_surveys_survey_lnk, grain_sample_question_surveys, and grain_sample_question_surveys_question_lnk.
+
+10) The CMR/TPDS Inspection Allocation Report requires the following tables: districts, sub_divisions_district_lnk, sub_divisions, blocks_sub_division_lnk, blocks, panchayats_block_lnk, panchayats, godowns, godowns_panchayat_lnk, godowns_godown_type_lnk, inspection_schedulings, inspection_schedulings_godown_lnk, inspection_schedulings_survey_type_lnk, inspection_schedulings_assigned_by_lnk, and inspection_schedulings_assigned_to_lnk.
+
+Please note that in the table surveys_survey_type_lnk, the column survey_type_id has the value 1 for the CMR type and 2 for the TPDS type. The same interpretation applies for the survey_type_id column in inspection_schedulings_survey_type_lnk. This information should be used to filter or match the correct survey type when generating queries.
