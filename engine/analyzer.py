@@ -9,13 +9,14 @@ from typing import Dict, List, Tuple, Union
 from llm_config.llm_call import generate_text
 
 class SQLAnalyzer:
-    def main_analyzer(self, query_info: str, query_results: List[Dict] = None) -> Dict[str, Union[bool, str, int, dict]]:
+    def main_analyzer(self, query_info: str, query_results: List[Dict] = None, api_key: str = None) -> Dict[str, Union[bool, str, int, dict]]:
         """
         Analyze SQL query results or query intent and generate comprehensive insights
         
         Args:
             query_info: Original query information
             query_results: Optional list of dictionaries containing query results
+            api_key: API key for LLM
         
         Returns:
             Dict containing:
@@ -54,7 +55,7 @@ class SQLAnalyzer:
                 """
             
             # Get analysis from LLM
-            analysis = generate_text(prompt)
+            analysis = generate_text(prompt, api_key)
             
             return {
                 "success": True,

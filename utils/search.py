@@ -1,6 +1,6 @@
-from utils.db_config import execute_query_with_columns
 from typing import Dict
 from fuzzywuzzy import fuzz
+from sqlalchemy import text
 
 def search_term_in_column(term: str, table_name: str, column_name: str, engine=None) -> Dict:
     """
@@ -9,13 +9,19 @@ def search_term_in_column(term: str, table_name: str, column_name: str, engine=N
         term: The term to search for
         table_name: The name of the table to search in
         column_name: The name of the column to search in
+        engine: SQLAlchemy engine to use for queries
     Returns:
         Dictionary containing the search term, matched value and score, or empty dict if no match found
     """
+    if engine is None:
+        return {}
+        
     # Validate table and column exist by attempting to query
     try:
         query = f"SELECT DISTINCT {column_name} FROM {table_name}"
-        columns, rows = execute_query_with_columns(query, engine=engine)
+        with engine.connect() as connection:
+            result = connection.execute(text(query))
+            rows = result.fetchall()
         if not rows:
             return {}
         distinct_values = [row[0] for row in rows]

@@ -28,7 +28,7 @@ class SQLVisualizer:
         # Remove any leading/trailing whitespace
         return python_text.strip()
     
-    def main_visualizer(self, query_info: str, query_results: List[Dict]) -> Dict:
+    def main_visualizer(self, query_info: str, query_results: List[Dict], api_key: str = None) -> Dict:
         try:
             # Create DataFrame just for reference
             df = pd.DataFrame(query_results)
@@ -40,17 +40,22 @@ class SQLVisualizer:
             Available columns: {list(df.columns)}
             Data sample: {df.head().to_dict()}
 
-            The code should
-            - Start with all necessary imports
-            - Then include 'df = pd.DataFrame(execution_results)'. Don't give any sample execution_results in the output.
-            - Then create visualizations using the DataFrame
-            - Use plt.figure() for each plot
-            - Use plt.show() to display plots
-            - Use plt.close() after each plot
+            CRITICAL INSTRUCTIONS:
+            - The variable 'execution_results' is already available and contains the data as a list of dictionaries.
+            - DO NOT create or use any hardcoded or summary data.
+            - Always start with: df = pd.DataFrame(execution_results)
+            - Use only the 'df' DataFrame for all visualizations.
+            - Do not create or use any other DataFrame or data variable.
+            - Create visualizations using the DataFrame.
+            - Use plt.figure() for each plot.
+            - Use plt.show() to display plots.
+            - Use plt.close() after each plot.
+            - Handle multiple plots properly.
             - Return ONLY the raw Python code, no markdown formatting, no ```python or ``` markers.
+            - Make sure plots are visible and well-formatted.
             """
             
-            viz_code = generate_text(prompt)
+            viz_code = generate_text(prompt, api_key)
             # Clean the visualization code to remove any markdown markers
             viz_code = self._clean_python_output(viz_code)
 

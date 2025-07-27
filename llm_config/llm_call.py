@@ -1,6 +1,4 @@
-import os
 import requests
-import json
 
 LLM_API_URL = "https://api.deepseek.com/v1/chat/completions"
 

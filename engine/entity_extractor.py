@@ -9,16 +9,16 @@ from typing import Dict, List
 from llm_config.llm_call import generate_text
 
 class EntityExtractor:
-    def main_entity_extractor(self, sql_query: str) -> List[Dict]:
+    def main_entity_extractor(self, sql_query: str, api_key: str) -> List[Dict]:
         """
         Extract entities from SQL query
-        
         Args:
             sql_query: SQL query to analyze
-            
+            api_key: API key for LLM
         Returns:
             List of dictionaries containing table, column, value mappings
         """
+        # Get entity mapping from LLM
         extraction_prompt = f"""You are an SQL entity extractor. Your ONLY task is to extract real-world entities.
 
 Format: table_name|column_name|comparison_value
@@ -80,26 +80,41 @@ Example Invalid Extractions (NEVER output these):
 CRITICAL INSTRUCTIONS:
 - If no valid entities are found, return ABSOLUTELY NOTHING. Not even empty lines or explanations.
 - ONLY output the exact table_name|column_name|comparison_value format for valid entities.
-- ANY other output format is considered an error."""
-        
-        # Get entity mapping from LLM
-        entity_text = generate_text(f"{extraction_prompt}\n\nQuery: {sql_query}")
-        
-        # Parse and validate extracted entities
-        extracted_entities = []
-        for line in entity_text.strip().split('\n'):
-            if '|' not in line:
-                continue
-                
-            table, column, value = line.strip().split('|')
-            table = table.strip()
-            column = column.strip()
-            value = value.strip()
+- ANY other output format is considered an error.
+- If no entities are found, return an empty string, not an error message.
+"""
+        try:
+            entity_text = generate_text(f"{extraction_prompt}\n\nQuery: {sql_query}", api_key)
             
-            extracted_entities.append({
-                "table": table,
-                "column": column,
-                "value": value
-            })
+            # Check if the response contains error messages or explanations
+            if any(error_word in entity_text.lower() for error_word in ['error', 'no entities', 'not found', 'invalid', 'cannot']):
+                return []
             
-        return extracted_entities 
+            # Parse and validate extracted entities
+            extracted_entities = []
+            for line in entity_text.strip().split('\n'):
+                if '|' not in line or line.strip() == '':
+                    continue
+                try:
+                    parts = line.strip().split('|')
+                    if len(parts) == 3:
+                        table, column, value = parts
+                        table = table.strip()
+                        column = column.strip()
+                        value = value.strip()
+                        
+                        # Validate that we have actual values
+                        if table and column and value:
+                            extracted_entities.append({
+                                "table": table,
+                                "column": column,
+                                "value": value
+                            })
+                except Exception:
+                    # Skip malformed lines
+                    continue
+                    
+            return extracted_entities
+        except Exception as e:
+            # If there's any error, return empty list
+            return [] 

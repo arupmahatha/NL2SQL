@@ -1,14 +1,6 @@
 from typing import Dict, List, Tuple
 import re
-
-import os
-import sys
-
-# Add the project root directory to Python path
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(project_root)
-
-from utils.db_config import execute_query_with_columns
+from sqlalchemy import text
 
 class SQLExecutor:
     def format_results_for_analysis(self, results: List[Dict]) -> str:
@@ -44,9 +36,32 @@ class SQLExecutor:
         # Combine all parts
         return "\n".join([header, separator] + formatted_rows)
 
+    def is_read_only_query(self, query: str) -> bool:
+        """
+        Check if the query is read-only by ensuring no blocked commands appear as complete words
+        """
+        query = query.lstrip().lower()
+        blocked_commands = [
+            'insert', 'update', 'delete', 'drop', 'create', 'alter', 'truncate',
+            'grant', 'revoke', 'commit', 'rollback'
+        ]
+        
+        # First check if query starts with a blocked command
+        first_word = query.split()[0] if query else ""
+        if first_word in blocked_commands:
+            return False
+            
+        # Then check if any blocked command appears as a complete word in the query
+        for cmd in blocked_commands:
+            # \b matches word boundaries, ensuring we match complete words only
+            if re.search(r'\b' + cmd + r'\b', query):
+                return False
+                
+        return True
+
     def main_executor(self, sql_query: str, engine) -> Tuple[bool, List[Dict], str, str]:
         """
-        Validate and execute SQL query safely
+        Validate and execute SQL query safely using the provided engine
         Returns:
             Tuple containing:
             - success: bool
@@ -55,8 +70,17 @@ class SQLExecutor:
             - error: Error message if any
         """
         try:
-            # Execute the query using the new db_config utility
-            columns, rows = execute_query_with_columns(sql_query, engine=engine)
+            # Validate query is read-only
+            if not self.is_read_only_query(sql_query):
+                return False, [], "", "Only SELECT queries are allowed for security reasons"
+            
+            # Execute the query directly using the provided engine
+            with engine.connect() as connection:
+                result = connection.execute(text(sql_query))
+                columns = result.keys()
+                rows = result.fetchall()
+                
+            # Convert to list of dictionaries
             results = [dict(zip(columns, row)) for row in rows]
             formatted_results = self.format_results_for_analysis(results)
             return True, results, formatted_results, ""
