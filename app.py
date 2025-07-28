@@ -9,7 +9,6 @@ from engine.executor import SQLExecutor
 from engine.analyzer import SQLAnalyzer
 from engine.visualizer import SQLVisualizer
 import json
-from utils.db_utils import get_engine_from_path
 from engine.schema_engine import SchemaEngine
 
 st.set_page_config(page_title="NL2SQL Workflow", layout="wide")
@@ -19,7 +18,6 @@ st.title("Natural Language to SQL Workflow")
 with st.sidebar:
     st.header("API & Database Setup")
     api_key = st.text_input("DeepSeek API Key", type="password")
-    db_path = st.text_input("Or enter path to a SQLite DB file", value="")
     db_file = st.file_uploader(
         "Upload a database or data file",
         type=["db", "sqlite", "sqlite3", "csv", "xlsx", "xls"]
@@ -31,13 +29,6 @@ schema_info = None
 if db_file is not None:
     try:
         engine, schema_info = SchemaEngine.from_upload(db_file)
-    except Exception as e:
-        st.warning(str(e))
-        engine = None
-        schema_info = None
-elif db_path:
-    try:
-        engine, schema_info = SchemaEngine.from_path(db_path)
     except Exception as e:
         st.warning(str(e))
         engine = None

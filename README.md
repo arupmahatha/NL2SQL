@@ -1,15 +1,14 @@
-# SQL Generation and Analysis System
+# NL2SQL Workflow System
 
-A sophisticated system that leverages Large Language Models (LLMs) to generate, refine, and analyze SQL queries from natural language input. The system supports either DeepSeek or Gemini model for high-quality SQL generation and validation.
+A sophisticated Natural Language to SQL conversion system that leverages Large Language Models (LLMs) to generate, refine, and analyze SQL queries from natural language input. The system provides a complete workflow from natural language query to SQL execution and visualization.
 
 ## System Architecture
 
 The system is built with a modular architecture consisting of several key components:
 
 ### 1. LLM Configuration (`llm_config/`)
-- Manages interactions with LLM providers (supports DeepSeek or Gemini)
+- Manages interactions with DeepSeek LLM API
 - Handles API calls, conversation history, and response formatting
-- Configurable model selection and parameters
 - Maintains conversation context for improved response quality
 
 ### 2. Core Engine Components (`engine/`)
@@ -19,7 +18,6 @@ The system is built with a modular architecture consisting of several key compon
 - Integrates schema information for context-aware generation
 - Supports complex queries with JOINs, subqueries, and aggregations
 - Ensures SQL syntax correctness and completeness
-- Maintains strict schema compliance and naming conventions
 
 #### Entity Extractor
 - Analyzes generated SQL to identify real-world entities
@@ -44,7 +42,7 @@ The system is built with a modular architecture consisting of several key compon
 - Provides formatted results for analysis
 
 #### Result Analyzer
-- Analyzes query execution results
+- Analyzes query execution results using LLM
 - Provides insights and explanations
 - Generates human-readable summaries
 
@@ -54,11 +52,15 @@ The system is built with a modular architecture consisting of several key compon
 - Supports various chart types and data representations
 - Ensures clean and reusable visualization code
 
+#### Schema Engine
+- Handles database schema extraction and management
+- Supports multiple database formats (SQLite, CSV, Excel)
+- Provides schema information for SQL generation
+
 ### 3. Utilities (`utils/`)
-- Database Configuration: Manages database connections and configurations
+- Database Utilities: Manages database connections and operations
 - Search Utilities: Provides fuzzy search and matching capabilities
 - Schema Files: Contains database schema definitions in JSON format
-- Guidance: Contains system prompts and guidance for LLM interactions
 
 ## Setup and Configuration
 
@@ -69,42 +71,33 @@ The system is built with a modular architecture consisting of several key compon
    pip install -r requirements.txt
    ```
 
-2. **API Keys**
-   Set one of the following environment variables based on your chosen LLM:
-   - `DEEPSEEK_API_KEY` (for DeepSeek model)
-   - `GEMINI_API_KEY` (for Gemini model)
+2. **Running the Application**
+   ```bash
+   streamlit run app.py
+   ```
 
-3. **Database Configuration**
-   Configure the following environment variables for database connection:
-   - `DB_HOST`: Database host address
-   - `DB_PORT`: Database port (default: 5432)
-   - `DB_NAME`: Database name
-   - `DB_USER`: Database username
-   - `DB_PASSWORD`: Database password
+## Usage
 
-## Example Usage
+1. **Start the Application**
+   - Run `streamlit run app.py`
+   - The application will open in your web browser
 
-The system includes example scripts demonstrating the usage of each component:
-- `engine/*_test.py`: Example scripts for core engine components
-- `utils/*_test.py`: Example scripts for utility functions
-- `llm_config/llm_call_test.py`: Example script for LLM configuration
+2. **Configure the Setup**
+   - Enter your DeepSeek API key in the sidebar
+   - Upload a database file (SQLite, CSV, Excel)
 
-Run example scripts using:
-```bash
-python engine/generator_test.py  # Example of using the SQL generator
-python engine/entity_extractor_test.py  # Example of using the entity extractor
-python engine/value_matcher_test.py  # Example of using the value matcher
-python engine/refiner_test.py  # Example of using the SQL refiner
-python engine/executor_test.py  # Example of using the SQL executor
-python engine/analyzer_test.py  # Example of using the result analyzer
-python engine/visualizer_test.py  # Example of using the SQL visualizer
-```
+3. **Query Processing**
+   - Enter your natural language query in the text area
+   - Click "Run Full Workflow" to process the query
+   - View the generated SQL, extracted entities, and execution results
+   - Explore visualizations and LLM analysis of the results
 
 ## Project Structure
 
 ```
 .
-├── engine/                 # Core SQL generation and processing engine
+├── app.py                 # Main Streamlit application
+├── engine/                # Core SQL generation and processing engine
 │   ├── generator.py       # SQL query generation
 │   ├── entity_extractor.py # Entity extraction from SQL
 │   ├── value_matcher.py   # Value matching utilities
@@ -112,35 +105,40 @@ python engine/visualizer_test.py  # Example of using the SQL visualizer
 │   ├── executor.py       # SQL query execution
 │   ├── analyzer.py       # Result analysis
 │   ├── visualizer.py     # Query result visualization
-│   └── *_test.py         # Example usage scripts
+│   └── schema_engine.py  # Database schema handling
 ├── llm_config/           # LLM configuration and API settings
-│   ├── llm_call.py      # LLM API interaction utilities
-│   └── llm_call_test.py # Example usage script
+│   └── llm_call.py      # LLM API interaction utilities
 ├── utils/               # Utility functions and helpers
-│   ├── db_config.py     # Database configuration
-│   ├── search.py        # Search utilities
-│   ├── db_schema.json   # Database schema definition
-│   ├── guidance.txt     # System prompts and guidance
-│   └── *_test.py        # Example usage scripts
-├── workflow_test.ipynb  # Jupyter notebook demonstrating the workflow
-└── requirements.txt     # Project dependencies
+│   └── search.py        # Search utilities
+├── requirements.txt     # Project dependencies
+└── README.md           # This file
 ```
+
+## Features
+
+- **Natural Language to SQL**: Convert plain English queries to SQL
+- **Multi-format Database Support**: Works with SQLite, CSV, and Excel files
+- **Entity Extraction**: Automatically identifies and validates database entities
+- **Value Matching**: Ensures data consistency and accuracy
+- **SQL Refinement**: Optimizes and improves generated SQL queries
+- **Result Analysis**: LLM-powered analysis of query results
+- **Data Visualization**: Automatic generation of appropriate charts and graphs
+- **Interactive Web Interface**: User-friendly Streamlit application
+- **Secure API Key Handling**: API keys are only taken from user input, not environment variables
 
 ## Dependencies
 
 - Python 3.8 or higher
-- PostgreSQL database
-- Access to either DeepSeek or Gemini API
+- Access to DeepSeek API
 
 Key Python packages:
+- streamlit: Web application framework
 - requests: HTTP requests for API calls
-- python-dotenv: Environment variable management
 - fuzzywuzzy: String matching and search
 - python-Levenshtein: Improves fuzzywuzzy performance
 - sqlalchemy: Database ORM
 - pandas: Data manipulation
 - numpy: Numerical computations
-- psycopg2-binary: PostgreSQL adapter
 - matplotlib: Data visualization
 - seaborn: Statistical data visualization
 

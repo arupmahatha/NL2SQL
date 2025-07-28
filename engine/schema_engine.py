@@ -2,7 +2,6 @@ import os
 import tempfile
 import pandas as pd
 from sqlalchemy import create_engine, inspect
-from utils.db_utils import get_engine_from_path
 
 class SchemaEngine:
     @staticmethod
@@ -29,12 +28,6 @@ class SchemaEngine:
             return engine, schema_info
         else:
             raise ValueError("Unsupported file type. Please upload SQLite, CSV, or Excel.")
-
-    @staticmethod
-    def from_path(db_path):
-        engine = get_engine_from_path(db_path)
-        schema_info = SchemaEngine._extract_schema_from_engine(engine)
-        return engine, schema_info
 
     @staticmethod
     def _extract_schema_from_engine(engine):

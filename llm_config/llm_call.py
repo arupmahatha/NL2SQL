@@ -7,8 +7,8 @@ LLM_API_URL = "https://api.deepseek.com/v1/chat/completions"
 conversation_history = []
 max_turns = 5
 
-def generate_text(prompt: str, api_key: str = None):
-    """Generate text using the default LLM (DeepSeek) with conversation history and user API key or .env fallback."""
+def generate_text(prompt: str, api_key: str):
+    """Generate text using the DeepSeek LLM with conversation history and user API key."""
     global conversation_history
     conversation_history.append({"role": "user", "content": prompt})
     messages = []
@@ -19,10 +19,6 @@ def generate_text(prompt: str, api_key: str = None):
             "role": entry["role"],
             "content": entry["content"]
         })
-    # Use provided api_key or fallback to .env
-    if api_key is None:
-        load_dotenv()
-        api_key = os.getenv("DEEPSEEK_API_KEY")
     return _call_llm_api(messages, api_key)
 
 def _call_llm_api(messages, api_key: str):
