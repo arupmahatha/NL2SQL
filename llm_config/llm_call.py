@@ -1,6 +1,5 @@
 import requests
 import os
-from dotenv import load_dotenv;
 
 LLM_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
