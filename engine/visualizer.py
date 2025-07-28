@@ -56,12 +56,14 @@ class SQLVisualizer:
             - Use only the 'df' DataFrame for all visualizations.
             - Do not create or use any other DataFrame or data variable.
             - Create visualizations using the DataFrame.
-            - Use plt.figure() for each plot.
-            - Use plt.show() to display plots.
-            - Use plt.close() after each plot.
+            - Use plt.figure(figsize=(12, 8), dpi=300) for each plot for high quality.
+            - DO NOT use plt.show() or plt.close() - these will be handled automatically.
             - Handle multiple plots properly.
             - Return ONLY the raw Python code, no markdown formatting, no ```python or ``` markers.
-            - Make sure plots are visible and well-formatted.
+            - Make sure plots are visible and well-formatted with good quality.
+            - Each plot should be a separate plt.figure() call.
+            - Use clear titles, labels, and readable fonts.
+            - Set appropriate figure sizes for readability.
             """
             
             viz_code = generate_text(prompt, api_key)
