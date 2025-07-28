@@ -29,6 +29,15 @@ class SQLVisualizer:
         return python_text.strip()
     
     def main_visualizer(self, query_info: str, query_results: List[Dict], api_key: str = None) -> Dict:
+        """
+        Generate visualization code for the given query and results using LLM.
+        Args:
+            query_info: The original query string
+            query_results: List of dictionaries with SQL results
+            api_key: API key for LLM (optional, will use .env if not provided)
+        Returns:
+            Dict with keys: success, generated_code, error
+        """
         try:
             # Create DataFrame just for reference
             df = pd.DataFrame(query_results)

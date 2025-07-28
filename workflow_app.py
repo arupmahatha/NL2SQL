@@ -9,6 +9,8 @@ from engine.executor import SQLExecutor
 from engine.analyzer import SQLAnalyzer
 from engine.visualizer import SQLVisualizer
 import json
+from utils.db_utils import get_engine_from_path
+from engine.schema_engine import SchemaEngine
 
 st.set_page_config(page_title="NL2SQL Workflow", layout="wide")
 st.title("Natural Language to SQL Workflow")
@@ -17,6 +19,7 @@ st.title("Natural Language to SQL Workflow")
 with st.sidebar:
     st.header("API & Database Setup")
     api_key = st.text_input("DeepSeek API Key", type="password")
+    db_path = st.text_input("Or enter path to a SQLite DB file", value="")
     db_file = st.file_uploader(
         "Upload a database or data file",
         type=["db", "sqlite", "sqlite3", "csv", "xlsx", "xls"]
@@ -26,40 +29,17 @@ engine = None
 uploaded_df = None
 schema_info = None
 if db_file is not None:
-    import tempfile
-    import os
-    suffix = db_file.name.split('.')[-1].lower()
-    if suffix in ["db", "sqlite", "sqlite3"]:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{suffix}') as tmp_file:
-            tmp_file.write(db_file.read())
-            tmp_path = tmp_file.name
-        engine = create_engine(f"sqlite:///{tmp_path}")
-        # Extract schema using SQLAlchemy inspector
-        inspector = inspect(engine)
-        formatted_schema = []
-        for table_name in inspector.get_table_names():
-            columns = []
-            for col in inspector.get_columns(table_name):
-                col_info = f"{col['name']} ({col['type']})"
-                columns.append(col_info)
-            formatted_schema.append(f"Table: {table_name}\nColumns:\n" + "\n".join(f"  - {col}" for col in columns))
-        schema_info = "\n\n".join(formatted_schema)
-    elif suffix in ["csv"]:
-        uploaded_df = pd.read_csv(db_file)
-        engine = create_engine("sqlite:///:memory:")
-        uploaded_df.to_sql("uploaded_table", engine, index=False, if_exists="replace")
-        # Extract schema from DataFrame
-        columns = [f"{col} ({str(dtype)})" for col, dtype in uploaded_df.dtypes.items()]
-        schema_info = f"Table: uploaded_table\nColumns:\n" + "\n".join(f"  - {col}" for col in columns)
-    elif suffix in ["xlsx", "xls"]:
-        uploaded_df = pd.read_excel(db_file)
-        engine = create_engine("sqlite:///:memory:")
-        uploaded_df.to_sql("uploaded_table", engine, index=False, if_exists="replace")
-        # Extract schema from DataFrame
-        columns = [f"{col} ({str(dtype)})" for col, dtype in uploaded_df.dtypes.items()]
-        schema_info = f"Table: uploaded_table\nColumns:\n" + "\n".join(f"  - {col}" for col in columns)
-    else:
-        st.warning("Unsupported file type. Please upload SQLite, CSV, or Excel.")
+    try:
+        engine, schema_info = SchemaEngine.from_upload(db_file)
+    except Exception as e:
+        st.warning(str(e))
+        engine = None
+        schema_info = None
+elif db_path:
+    try:
+        engine, schema_info = SchemaEngine.from_path(db_path)
+    except Exception as e:
+        st.warning(str(e))
         engine = None
         schema_info = None
 

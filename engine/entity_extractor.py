@@ -9,12 +9,12 @@ from typing import Dict, List
 from llm_config.llm_call import generate_text
 
 class EntityExtractor:
-    def main_entity_extractor(self, sql_query: str, api_key: str) -> List[Dict]:
+    def main_entity_extractor(self, sql_query: str, api_key: str = None) -> List[Dict]:
         """
         Extract entities from SQL query
         Args:
             sql_query: SQL query to analyze
-            api_key: API key for LLM
+            api_key: API key for LLM (optional, will use .env if not provided)
         Returns:
             List of dictionaries containing table, column, value mappings
         """

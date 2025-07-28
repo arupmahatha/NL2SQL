@@ -16,7 +16,7 @@ class SQLAnalyzer:
         Args:
             query_info: Original query information
             query_results: Optional list of dictionaries containing query results
-            api_key: API key for LLM
+            api_key: API key for LLM (optional, will use .env if not provided)
         
         Returns:
             Dict containing:
